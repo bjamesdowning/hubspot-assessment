@@ -64,18 +64,26 @@ This POC demonstrates how Breezy can leverage HubSpot as its central customer tr
 ## D. HubSpot Data Architecture
 
 ### Entity Relationship Diagram (ERD)
-The architecture follows a standard CRM pattern where a Contact is the central person object, and Deals represent revenue opportunities.
+The architecture follows a standard B2B CRM pattern (Company-Centric), ensuring that data is organized by Account rather than just individual people. This supports Breezy's high-volume sales motion by grouping multiple leads under one organization.
 
 ```mermaid
 erDiagram
-    CONTACT ||--o{ DEAL : "associated_with"
+    COMPANY ||--o{ CONTACT : "employs"
+    COMPANY ||--o{ DEAL : "billing_entity_for"
+    CONTACT ||--o{ DEAL : "champion_for"
+
+    COMPANY {
+        string domain "Primary Key / De-duplication"
+        string name
+        string industry
+        string annual_revenue
+    }
     CONTACT {
-        string firstname
-        string lastname
-        string email
+        string email "Primary Key"
         string jobtitle
-        string company
-        string phone
+        string lifecycle_stage "Subscriber -> Customer"
+        number ai_lead_score "Custom: 0-100 Qualification"
+        string ai_icebreaker "Custom: AI Generated Insight"
     }
     DEAL {
         string dealname
@@ -85,6 +93,23 @@ erDiagram
         string pipeline
     }
 ```
+
+### Design Decisions & Rationale
+
+1.  **Company-First Architecture**:
+    *   **Relation**: `COMPANY ||--o{ CONTACT`
+    *   **Why**: Breezy sells to businesses, not just people. Using the `Company` object allows sales reps to see all stakeholders (Contacts) for a single Account in one view. It prevents data silos where 5 people from the same company exist as unconnected records.
+
+2.  **Custom AI Properties**:
+    *   **Properties**: `ai_lead_score` (Number), `ai_icebreaker` (String)
+    *   **Why**: Storing AI insights as structured data properties (rather than just Notes) is critical. It allows Breezy to:
+        *   Create **Active Lists** of "Hot Leads" (e.g., Score > 80).
+        *   Trigger **Workflows** to auto-assign high-scoring leads.
+        *   Visualize lead quality in **Reports**.
+
+3.  **Deal Associations**:
+    *   **Relation**: `COMPANY` is the primary parent of `DEAL`.
+    *   **Why**: If a Contact leaves their job (the "Champion"), the Deal should not be orphaned. Associating Deals with the Company ensures historical revenue data remains intact even as employees churn.
 
 ---
 
