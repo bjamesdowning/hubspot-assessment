@@ -104,6 +104,8 @@ erDiagram
 
 ### Design Decisions & Rationale
 
+> This section was written with AI assistance to review options for Breezy data modeling and architecture.
+
 1.  **Consumer-First Architecture (B2C)**:
     *   **Relation**: `CONTACT` is the central node.
     *   **Why**: Breezy sells directly to homeowners.
