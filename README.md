@@ -76,65 +76,52 @@ This POC demonstrates how Breezy can leverage HubSpot as its central customer tr
 ## D. HubSpot Data Architecture
 
 ### Entity Relationship Diagram (ERD)
-The architecture follows a standard B2B CRM pattern (Company-Centric), ensuring that data is organized by Account rather than just individual people. This supports Breezy's high-volume sales motion by grouping multiple leads under one organization.
+The architecture follows a **B2C Consumer-Centric** pattern, designed for a high-volume hardware + SaaS business. The `Contact` is the primary entity, with revenue tracked via distinct pipelines for Hardware Sales and Subscription Management.
 
 ```mermaid
 erDiagram
-    OWNER ||--o{ CONTACT : "owns"
-    OWNER ||--o{ DEAL : "owns"
-    COMPANY ||--o{ CONTACT : "employs"
-    COMPANY ||--o{ DEAL : "billing_entity_for"
-    CONTACT ||--o{ DEAL : "associated_with (ID:3)"
+    CONTACT ||--o{ DEAL : "makes_purchase"
+    CONTACT ||--o{ TICKET : "requests_support"
+    DEAL ||--o{ LINE_ITEM : "includes_product"
 
-    OWNER {
-        string email
-        string first_name
-        string last_name
-    }
-    COMPANY {
-        string domain "Primary Key / De-duplication"
-        string name
-        string industry
-        string annual_revenue
-    }
     CONTACT {
         string email "Primary Key"
-        string jobtitle
-        string lifecycle_stage "Subscriber -> Customer"
-        number ai_lead_score "Custom: 0-100 Qualification"
-        string ai_icebreaker "Custom: AI Generated Insight"
+        string subscription_status "Trial | Premium | Churned"
+        int device_count "Rollup: # of Thermostats"
     }
     DEAL {
-        string dealname
-        float amount
+        string pipeline "Hardware | Subscription"
         string dealstage
-        date closedate
-        string pipeline
+        date close_date
+        float amount
+    }
+    LINE_ITEM {
+        string name "Breezy Thermostat"
+        string sku
+        int quantity
     }
 ```
 
 ### Design Decisions & Rationale
 
-1.  **Company-First Architecture**:
-    *   **Relation**: `COMPANY ||--o{ CONTACT`
-    *   **Why**: Breezy sells to businesses, not just people. Using the `Company` object allows sales reps to see all stakeholders (Contacts) for a single Account in one view. It prevents data silos where 5 people from the same company exist as unconnected records.
+1.  **Consumer-First Architecture (B2C)**:
+    *   **Relation**: `CONTACT` is the central node.
+    *   **Why**: Breezy sells directly to homeowners.
 
-2.  **Custom AI Properties**:
-    *   **Properties**: `ai_lead_score` (Number), `ai_icebreaker` (String)
-    *   **Why**: Storing AI insights as structured data properties (rather than just Notes) is critical. It allows Breezy to:
-        *   Create **Active Lists** of "Hot Leads" (e.g., Score > 80).
-        *   Trigger **Workflows** to auto-assign high-scoring leads.
-        *   Visualize lead quality in **Reports**.
+2.  **Dual-Pipeline Strategy**:
+    *   **Mechanism**: Separate Deal Pipelines for "Hardware Sales" and "Subscriptions".
+    *   **Why**: These are two different business models.
+        *   **Hardware**: Linear flow (Checkout -> Shipped -> Delivered).
+        *   **Subscription**: Recurring/Lifecycle flow (Trial -> Active -> Churned).
+        Separating them allows for accurate forecasting and distinct reporting for the hardware vs. SaaS divisions.
 
-3.  **Deal Associations**:
-    *   **Relation**: `COMPANY` is the primary parent of `DEAL`.
-    *   **Why**: If a Contact leaves their job (the "Champion"), the Deal should not be orphaned. Associating Deals with the Company ensures historical revenue data remains intact even as employees churn.
+3.  **Expansion & Upsell Logic**:
+    *   **Property**: `device_count` (Rollup).
+    *   **Why**: By tracking how many thermostats a customer owns (via Line Items on Won Deals), we can identify "Power Users" for targeted Premium marketing. A customer with 3+ devices is a prime target for a "Whole Home" premium plan.
 
-4.  **HubSpot Owner (User) Mapping**:
-    *   **Relation**: `OWNER ||--o{ CONTACT` and `OWNER ||--o{ DEAL`
-    *   **Why**: In a production environment, "Users" (Sales Reps) must be assigned to records to manage accountability. The `hubspot_owner_id` field on Contacts and Deals links them to a specific system User. This allows for:
-        *   **Pipeline Partitioning**: Reps only see their own deals.
-        *   **Commission Reporting**: attributing closed revenue to the correct user.
+4.  **Support Integration**:
+    *   **Relation**: `CONTACT ||--o{ TICKET`
+    *   **Why**: In Smart Home tech, post-sales support is critical. Linking Tickets to Contacts ensures that if a Trial user complains about setup, the Success team can intervene immediately to prevent churn.
 
 ---
 
