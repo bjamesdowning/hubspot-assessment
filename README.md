@@ -110,14 +110,14 @@ erDiagram
     *   **Relation**: `CONTACT` is the central node.
     *   **Why**: Breezy sells directly to homeowners.
 
-2.  **Dual-Pipeline Strategy**:
+2.  **Dual-Pipeline Strategy**: Unable to implement this in code due to multiple pipelines being a paid feature I do not have access to in my HubSpot portal
     *   **Mechanism**: Separate Deal Pipelines for "Hardware Sales" and "Subscriptions".
     *   **Why**: These are two different business models.
         *   **Hardware**: Linear flow (Checkout -> Shipped -> Delivered).
         *   **Subscription**: Recurring/Lifecycle flow (Trial -> Active -> Churned).
         Separating them allows for accurate forecasting and distinct reporting for the hardware vs. SaaS divisions.
 
-3.  **Expansion & Upsell Logic**:
+3.  **Expansion & Upsell Logic**: Created custom properties to track device count on the Contact object
     *   **Property**: `device_count` (Rollup).
     *   **Why**: By tracking how many thermostats a customer owns (via Line Items on Won Deals), we can identify "Power Users" for targeted Premium marketing. A customer with 3+ devices is a prime target for a "Whole Home" premium plan.
 
