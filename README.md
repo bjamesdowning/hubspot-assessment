@@ -58,6 +58,12 @@ This POC demonstrates how Breezy can leverage HubSpot as its central customer tr
 ## C. AI Usage Documentation
 
 **AI Tools Used:**
+> This section is not written by AI
+
+- Utilized Google's Antigravity IDE coupled with Gemini 3 Pro (high) for orchestration of the application build itself. I simply guided the agentic platform towards several iterations of testing and adding features until requirements were met. I used Gemini to generate the inital prompt to ensure the agentic platform had a verbose and clearly defined set of requirements to avoid halucinations and ensure quicker adhearance to my own preferences of language choice, simplicity in design, and ease of deployment. 
+- This was an exercise of learning about the new Antigravity IDE and how to guide it to create, test, and ensure the application is secure by following simple design philosophy and efficiency.
+- The AI feature within the application simply uses a faster, lower cost and faster model (gemini 2.5 flash lite) within Google's free-tier in Google AI Studio.
+- Gemini also assisted me in parsing HubSpot documentation to better understand the platform itself and data models associatd. 
 
 ---
 
