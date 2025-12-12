@@ -1,0 +1,31 @@
+{
+  "name": "hubspot-sa-assessment-backend",
+  "version": "1.0.0",
+  "description": "Backend server for HubSpot Solutions Architect Technical Assessment - Breezy Integration",
+  "main": "server.js",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "nodemon server.js",
+    "client:dev": "npm run dev --prefix client",
+    "setup": "npm install && npm install --prefix client"
+  },
+  "keywords": [
+    "hubspot",
+    "integration",
+    "assessment"
+  ],
+  "author": "HubSpot",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "axios": "^1.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "nodemon": "^3.0.1"
+  }
+}
